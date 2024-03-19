@@ -33,7 +33,10 @@ def generate_report(succeeded: list[str], failed: list[tuple[str, str]]):
             f.write(f"{vid}: {reason}\n")
 
 def get_content_holodex(api_key: str, start_page: int = 1, end_page: int = 1, min_time: int = 65, max_time: int = 480) -> tuple[list[str], list[tuple[str, str]]]:
-    scraper = SiteScraper()
+    chrome_driver_path = os.getenv("CHROME_DRIVER_PATH")
+    if chrome_driver_path is None:
+        chrome_driver_path = "/usr/bin/chromedriver"
+    scraper = SiteScraper(chrome_driver_path=chrome_driver_path)
     holodex_url = "https://holodex.net/search?q=type,value,text%0Atopic,Music_Cover,Music_Cover%0Atopic,Original_Song,Original_Song&page="
     for page in range(start_page, end_page + 1):
         log_message(f"Getting content via Holodex page {page} of {end_page}")

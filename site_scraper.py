@@ -3,7 +3,7 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium import webdriver
 import time
 class SiteScraper:
-    def __init__(self):
+    def __init__(self, chrome_driver_path: str ):
         try:
             self.service = Service()
             self.chrome_options = ChromeOptions()
