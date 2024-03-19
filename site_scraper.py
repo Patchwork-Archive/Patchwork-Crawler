@@ -5,7 +5,7 @@ import time
 class SiteScraper:
     def __init__(self, chrome_driver_path: str ):
         try:
-            self.service = Service()
+            self.service = Service(chrome_driver_path)
             self.chrome_options = ChromeOptions()
             self.driver = webdriver.Chrome(service=self.service, options=self.chrome_options)
         except FileNotFoundError:
