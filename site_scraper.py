@@ -2,6 +2,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium import webdriver
 import time
+
+
 class SiteScraper:
     def __init__(self, chrome_driver_path: str ):
         try:
@@ -28,7 +30,7 @@ class SiteScraper:
             print(f"An error occurred while trying to get the page source: {e}")
             return ""
         if wait_time > 0:
-            time.sleep(5)
+            time.sleep(wait_time)
         return self.driver.page_source
 
     def close(self):
