@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from site_scraper import SiteScraper
+from sql_handler import SQLHandler
 import source_parse
 import holodex
 import youtube
@@ -90,6 +91,12 @@ def enqueue_content_to_api(videoId: str, prepend_url="https://youtube.com/watch?
         log_message(f"Successfully enqueued video {videoId}")
     return response.status_code
 
+def enqueue_content_to_db(videoId: str, prepend_url="https://youtube.com/watch?v=") -> bool:
+    server = SQLHandler()
+    log_message("Enqueuing content to the DB...")
+    server.insert_row("archive_queue", "url, mode", (prepend_url+videoId, 0))
+    return True
+
 
 def main(args):
     if not args.youtube:
@@ -102,7 +109,10 @@ def main(args):
                                                                 args.wait_time
                                                                 )
         for vid_id in valid_video_ids:
-            enqueue_content_to_api(vid_id)
+            if args.db:
+                enqueue_content_to_db(vid_id)
+            else:
+                enqueue_content_to_api(vid_id)
         generate_report(valid_video_ids, invalid_video_ids)
         return
     # YouTube mode
@@ -119,7 +129,10 @@ def main(args):
             failed = list(set(failed))
             for vid_id, title in succeeded:
                 print(f"Validated {vid_id} - {title} to API")
-                enqueue_content_to_api(vid_id)
+                if args.db:
+                    enqueue_content_to_db(vid_id)
+                else:
+                    enqueue_content_to_api(vid_id)
                 
             
 
@@ -132,6 +145,7 @@ if __name__ == '__main__':
     parser.add_argument("--max-time", type=int, default=480, help="The maximum length of a video in seconds")
     parser.add_argument("--wait_time", type=int, default=5, help="The amount of time to wait for JS to load in sec (default=5)")
     parser.add_argument("--youtube", action="store_true", help="Scrape YouTube channels instead of Holodex")
+    parser.add_argument("--db", action="store_true", help="Enqueue content to the DB instead of the API")
     parser.add_argument("--channel_id_source", type=str, default="channels.txt", help="The file containing the channel IDs. Specify DB to use MySQL DB via env variables")
     if not load_dotenv():
         print("No .env file found. Please create one and try again. (Use the template)")
