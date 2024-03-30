@@ -111,6 +111,9 @@ def main(args):
         for vid_id in valid_video_ids:
             if args.db:
                 enqueue_content_to_db(vid_id)
+            elif args.stub:
+                with open("stub.txt", "a") as f:
+                    f.write(f"{vid_id}\n")
             else:
                 enqueue_content_to_api(vid_id)
         generate_report(valid_video_ids, invalid_video_ids)
@@ -124,13 +127,16 @@ def main(args):
             os.makedirs("logs")
         for line in file:
             channel_id = line.strip()
-            succeeded, failed = youtube.get_content_youtube(channel_id)
+            succeeded, failed = youtube.get_content_youtube(channel_id, args.min_time, args.max_time, args.wait_time)
             succeeded = list(set(succeeded))
             failed = list(set(failed))
             for vid_id, title in succeeded:
                 print(f"Validated {vid_id} - {title} to API")
                 if args.db:
                     enqueue_content_to_db(vid_id)
+                elif args.stub:
+                    with open("stub.txt", "a") as f:
+                        f.write(f"{vid_id}\n")
                 else:
                     enqueue_content_to_api(vid_id)
                 
@@ -146,7 +152,13 @@ if __name__ == '__main__':
     parser.add_argument("--wait_time", type=int, default=5, help="The amount of time to wait for JS to load in sec (default=5)")
     parser.add_argument("--youtube", action="store_true", help="Scrape YouTube channels instead of Holodex")
     parser.add_argument("--db", action="store_true", help="Enqueue content to the DB instead of the API")
+    parser.add_argument("--stub", action="store_true", help="Enqueue to a stub file instead of the API or DB")
     parser.add_argument("--channel_id_source", type=str, default="channels.txt", help="The file containing the channel IDs. Specify DB to use MySQL DB via env variables")
+    parser.add_argument("--detailed", action="store_true", help="Visits each video and checks for validity with more detail")
+    if parser.parse_args().stub:
+        if not os.path.exists("stub.txt"):
+            with open("stub.txt", "w") as f:
+                f.write("Stub file for Patchwork Archive")
     if not load_dotenv():
         print("No .env file found. Please create one and try again. (Use the template)")
         quit()
