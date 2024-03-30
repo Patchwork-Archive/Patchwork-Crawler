@@ -28,7 +28,12 @@ def get_content_youtube(channel_id: str, min_time: int = 65, max_time: int = 480
         if music_flag[0]: # Check if the video is music content
             # Stage 2. Check length of video
             ytdl.extract_info(video_id, download=False)
-            video_info = ytdl.extract_info(video_id, download=False)
+            try:
+                video_info = ytdl.extract_info(video_id, download=False)
+            except Exception:
+                print(f"[YouTube Parse] Unable to get video info for {video_id}. Skipping...")
+                failed.append((video_id, "Unable to get video info"))
+                continue
             if video_info.get('duration') is not None:
                 duration = video_info.get('duration')
                 if duration > min_time and duration < max_time:
