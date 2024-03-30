@@ -93,6 +93,9 @@ def enqueue_content_to_api(videoId: str, prepend_url="https://youtube.com/watch?
 
 def enqueue_content_to_db(videoId: str, prepend_url="https://youtube.com/watch?v=") -> bool:
     server = SQLHandler()
+    if server.check_row_exists("songs", "video_id", videoId):
+        log_message(f"Video {videoId} already exists in the DB")
+        return False
     log_message("Enqueuing content to the DB...")
     server.insert_row("archive_queue", "url, mode", (prepend_url+videoId, 0))
     return True
