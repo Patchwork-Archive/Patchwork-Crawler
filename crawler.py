@@ -36,21 +36,6 @@ def generate_report(succeeded: list[str], failed: list[tuple[str, str]]) -> str:
             f.write(f"{vid}: {reason}\n")
     return f"logs/report_{current_time_str}.txt"
 
-# def merge_report(report1: str, report2: str, sep_text="") -> str:
-#     """
-#     Merge two reports into one. Report2 will be appended to the end of Report1
-#     :param report1: The path to the first report
-#     :param report2: The path to the second report
-#     :param sep_text: The text to separate the reports
-#     :returns: The path to the merged report
-#     """
-#     with open(report1, "a") as f1:
-#         with open(report2, "r") as f2:
-#             f1.write(sep_text)
-#             f1.write(f2.read())
-#     return report1
-
-
 def get_content_holodex(api_key: str, start_page: int = 1, end_page: int = 1, min_time: int = 65, max_time: int = 480, wait_time: int =5) -> tuple[list[str], list[tuple[str, str]]]:
     chrome_driver_path = os.getenv("CHROME_DRIVER_PATH")
     if chrome_driver_path is None:
@@ -147,8 +132,8 @@ def main(args):
                         f.write(f"{vid_id}\n")
                 else:
                     enqueue_content_to_api(vid_id)
-                
-            
+
+
 
 
 if __name__ == '__main__':
