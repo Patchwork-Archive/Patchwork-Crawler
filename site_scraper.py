@@ -5,10 +5,21 @@ import time
 
 
 class SiteScraper:
-    def __init__(self, chrome_driver_path: str ):
+    def __init__(self, chrome_driver_path: str, headless: bool = True):
+        """
+        Initialize the SiteScraper with the path to ChromeDriver
+        :param chrome_driver_path: Path to the ChromeDriver executable
+        :param headless: Run the browser in headless mode if True
+        """
         try:
             self.service = Service(chrome_driver_path)
             self.chrome_options = ChromeOptions()
+
+            if headless:
+                self.chrome_options.add_argument("--headless")
+                self.chrome_options.add_argument("--disable-gpu")
+                self.chrome_options.add_argument("--window-size=1920,1080")
+
             self.driver = webdriver.Chrome(service=self.service, options=self.chrome_options)
         except FileNotFoundError:
             print("The ChromeDriver executable was not found. Is it installed and accessible in PATH?")
@@ -17,7 +28,6 @@ class SiteScraper:
             print(f"An unknown error occurred: {e}")
             quit()
 
-    
     def get_page_source(self, url, wait_time=5) -> str:
         """
         Get the page source of the given URL
