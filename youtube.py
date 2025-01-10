@@ -31,7 +31,7 @@ def get_videos_in_playlist(playlist_url: str,  min_time: int = 65, max_time: int
     scraper = SiteScraper(chrome_driver_path=chrome_driver_path, wait_time=wait_time)
     return scrape_yt_playlist(playlist_url, scraper)
 
-def get_content_youtube(channel_id: str, min_time: int = 65, max_time: int = 480, wait_time: int = 5) -> tuple[list[str], list[tuple[str, str]]]:
+def get_content_youtube_channel(channel_id: str, min_time: int = 65, max_time: int = 480, wait_time: int = 5) -> tuple[list[str], list[tuple[str, str]]]:
     if not channel_id.startswith("UC") or not len(channel_id) == 24:
         print("[Error] Invalid Channel ID provided " + channel_id)
         return

@@ -94,6 +94,10 @@ def enqueue_content_to_db(videoId: str, prepend_url="https://youtube.com/watch?v
 
 
 def main(args):
+    """
+    main function logic
+    """
+
     if args.playlist:
         videos = youtube.get_videos_in_playlist(args.playlist)
         print(f"Scraping playlist complete. Total of {len(videos)} videos were found")
@@ -101,6 +105,20 @@ def main(args):
             print(f"Enqueueing {video_title} - {video_id}")
             enqueue_content_to_db(video_id)
         exit()
+
+    if args.channel:
+        succeeded, failed = youtube.get_content_youtube_channel(args.channel.strip(), args.min_time, args.max_time, args.wait_time)
+        succeeded = list(set(succeeded))
+        failed = list(set(failed))
+        for vid_id, title in succeeded:
+            print(f"Validated {vid_id} - {title} to API")
+            if args.db:
+                enqueue_content_to_db(vid_id)
+            elif args.stub:
+                with open("stub.txt", "a") as f:
+                    f.write(f"{vid_id}\n")
+            else:
+                enqueue_content_to_api(vid_id)
 
     if not args.youtube:
         # Default Holodex mode
@@ -130,7 +148,7 @@ def main(args):
             os.makedirs("logs")
         for line in file:
             channel_id = line.strip()
-            succeeded, failed = youtube.get_content_youtube(channel_id, args.min_time, args.max_time, args.wait_time)
+            succeeded, failed = youtube.get_content_youtube_channel(channel_id, args.min_time, args.max_time, args.wait_time)
             succeeded = list(set(succeeded))
             failed = list(set(failed))
             for vid_id, title in succeeded:
@@ -155,6 +173,7 @@ if __name__ == '__main__':
     parser.add_argument("--wait_time", type=int, default=5, help="The amount of time to wait for JS to load in sec (default=5)")
     parser.add_argument("--youtube", action="store_true", help="Scrape YouTube channels instead of Holodex")
     parser.add_argument("--playlist", type=str, help="Scrape a playlist instead of a channel by the YT playlist ID. Can only specify one playlist per run")
+    parser.add_argument("--channel", type=str, help="Channel ID of YouTube Channel. Scrapes a singular channel for its contents")
     parser.add_argument("--db", action="store_true", help="Enqueue content to the DB instead of the API")
     parser.add_argument("--stub", action="store_true", help="Enqueue to a stub file instead of the API or DB")
     parser.add_argument("--channel_id_source", type=str, default="channels.txt", help="The file containing the channel IDs. Specify DB to use MySQL DB via env variables")
