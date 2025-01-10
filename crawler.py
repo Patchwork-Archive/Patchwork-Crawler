@@ -9,6 +9,9 @@ import time
 import requests
 import argparse
 
+# Constant value for a search page to find covers and songs
+HOLODEX_SEARCH_PAGE = "https://holodex.net/search?q=type,value,text%0Atopic,Music_Cover,Music_Cover%0Atopic,Original_Song,Original_Song&page="
+
 def log_message(message: str):
     """
     Log a message to the console and a log file
@@ -40,13 +43,12 @@ def get_content_holodex(api_key: str, start_page: int = 1, end_page: int = 1, mi
     chrome_driver_path = os.getenv("CHROME_DRIVER_PATH")
     if chrome_driver_path is None:
         chrome_driver_path = "/usr/bin/chromedriver"
-    scraper = SiteScraper(chrome_driver_path=chrome_driver_path)
+    scraper = SiteScraper(chrome_driver_path=chrome_driver_path, wait_time=wait_time)
     succeeded = []
     failed = []
-    holodex_url = "https://holodex.net/search?q=type,value,text%0Atopic,Music_Cover,Music_Cover%0Atopic,Original_Song,Original_Song&page="
     for page in range(start_page, end_page + 1):
         log_message(f"Getting content via Holodex page {page} of {end_page}")
-        data = scraper.get_page_source(f"{holodex_url}{page}", wait_time)
+        data = scraper.get_page_source(f"{HOLODEX_SEARCH_PAGE}{page}")
         video_ids = source_parse.find_all_yt_video_ids_hldex(data)
         log_message(f"Found {len(video_ids)} videos. Checking validity...")
         for vid in video_ids:
