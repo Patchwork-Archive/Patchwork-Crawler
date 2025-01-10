@@ -22,8 +22,7 @@ def find_all_yt_videos_yt(source: str) -> list[str, str]:
     :return: A list of video IDs
     """
     soup = BeautifulSoup(source, "html.parser")
-    videos = []
-    video_ids = set()  # to store unique video IDs
+    videos = set()
     for h3_tag in soup.find_all('h3', class_='style-scope ytd-rich-grid-media'):
         a_tag = h3_tag.find('a', id='video-title-link')
         if a_tag:
@@ -32,10 +31,23 @@ def find_all_yt_videos_yt(source: str) -> list[str, str]:
             if href and title:
                 video_id = re.search(r'/watch\?v=(\w+)', href)
                 # check if video_id is valid youtube video id and not already in video_ids set
-                if video_id and len(video_id.group(1)) >= 11 and video_id.group(1) not in video_ids:
-                    video_ids.add(video_id.group(1))  # add video_id to set
-                    videos.append((video_id.group(1), title))
-    return videos
+                if video_id:
+                    videos.add((video_id.group(1), title))
+    return list(videos)
+
+def find_all_videos_yt_playlist(source: str) -> list[str, str]:
+    soup = BeautifulSoup(source, "html.parser")
+    videos = set()
+    for h3_tag in soup.find_all('h3', class_='style-scope ytd-playlist-video-renderer'):
+        a_tag = h3_tag.find('a', id='video-title')
+        if a_tag:
+            href = a_tag.get('href')
+            title = a_tag.get('title')
+            if href and title:
+                video_id = href.split('&')[0].replace("/watch?v=", "")
+                print(video_id, title)
+                videos.add((video_id, title))
+    return list(videos)
 
 
 def parse_title_yt_video(source: str) -> str:
@@ -57,4 +69,3 @@ def is_potentially_music_content(title: str)-> tuple[bool, str]:
     if not any(keyword in title for keyword in music_keywords):
         return False, "No music keywords found"
     return True, "Valid music content"
-

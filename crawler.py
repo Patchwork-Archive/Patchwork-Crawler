@@ -92,6 +92,14 @@ def enqueue_content_to_db(videoId: str, prepend_url="https://youtube.com/watch?v
 
 
 def main(args):
+    if args.playlist:
+        videos = youtube.get_videos_in_playlist(args.playlist)
+        print(f"Scraping playlist complete. Total of {len(videos)} videos were found")
+        for video_id, video_title in videos:
+            print(f"Enqueueing {video_title} - {video_id}")
+            enqueue_content_to_db(video_id)
+        exit()
+
     if not args.youtube:
         # Default Holodex mode
         valid_video_ids, invalid_video_ids = get_content_holodex(os.getenv("HOLODEX_API_KEY"),
@@ -113,7 +121,7 @@ def main(args):
         return
     # YouTube mode
     if args.channel_id_source == "DB":
-        pass
+        pass # TODO: Read from DB in the future
     else:
         file = open(args.channel_id_source, "r")
         if not os.path.exists("logs"):
@@ -144,6 +152,7 @@ if __name__ == '__main__':
     parser.add_argument("--max-time", type=int, default=480, help="The maximum length of a video in seconds")
     parser.add_argument("--wait_time", type=int, default=5, help="The amount of time to wait for JS to load in sec (default=5)")
     parser.add_argument("--youtube", action="store_true", help="Scrape YouTube channels instead of Holodex")
+    parser.add_argument("--playlist", type=str, help="Scrape a playlist instead of a channel by the YT playlist ID. Can only specify one playlist per run")
     parser.add_argument("--db", action="store_true", help="Enqueue content to the DB instead of the API")
     parser.add_argument("--stub", action="store_true", help="Enqueue to a stub file instead of the API or DB")
     parser.add_argument("--channel_id_source", type=str, default="channels.txt", help="The file containing the channel IDs. Specify DB to use MySQL DB via env variables")

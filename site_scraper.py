@@ -5,12 +5,13 @@ import time
 
 
 class SiteScraper:
-    def __init__(self, chrome_driver_path: str, headless: bool = True):
+    def __init__(self, chrome_driver_path: str, headless: bool = True, wait_time = 5):
         """
         Initialize the SiteScraper with the path to ChromeDriver
         :param chrome_driver_path: Path to the ChromeDriver executable
         :param headless: Run the browser in headless mode if True
         """
+        self.wait_time = wait_time
         try:
             self.service = Service(chrome_driver_path)
             self.chrome_options = ChromeOptions()
@@ -29,7 +30,7 @@ class SiteScraper:
             print(f"An unknown error occurred: {e}")
             quit()
 
-    def get_page_source(self, url, wait_time=5) -> str:
+    def get_page_source(self, url) -> str:
         """
         Get the page source of the given URL
         :param url: The URL of the page to scrape
@@ -40,8 +41,8 @@ class SiteScraper:
         except Exception as e:
             print(f"An error occurred while trying to get the page source: {e}")
             return ""
-        if wait_time > 0:
-            time.sleep(wait_time)
+        if self.wait_time > 0:
+            time.sleep(self.wait_time)
         return self.driver.page_source
 
     def close(self):

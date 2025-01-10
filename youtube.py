@@ -1,15 +1,35 @@
+import channel_list_tools
 from site_scraper  import SiteScraper
-from source_parse import find_all_yt_videos_yt, parse_title_yt_video, is_potentially_music_content
+from source_parse import find_all_yt_videos_yt, parse_title_yt_video, find_all_videos_yt_playlist, is_potentially_music_content
 import yt_dlp
 import os
+
+def scrape_yt_playlist(playlist_url: str, scraper: SiteScraper) -> list[str, str]:
+    """
+    Scrapes a YouTube playlist for all videos
+    """
+    if not playlist_url.startswith("https://www.youtube.com/playlist?list="):
+        playlist_url = "https://www.youtube.com/playlist?list=" + playlist_url
+    playlist_page_raw_data = scraper.get_page_source(playlist_url)
+    return find_all_videos_yt_playlist(playlist_page_raw_data)
+
 
 def scrape_yt_channel_videos(channel_url: str, scraper: SiteScraper) -> tuple[str, str]:
     """
     Scrapes a YouTube channel for all videos and their titles
     """
+    if not channel_url.startswith("https://youtube.com/watch?v=") or not channel_url.startswith("https://youtu.be/"):
+        channel_url = "https://youtube.com/watch?v=" + channel_url
     channel_video_raw_data = scraper.get_page_source(channel_url)
     video_tuples = find_all_yt_videos_yt(channel_video_raw_data)
     return video_tuples
+
+def get_videos_in_playlist(playlist_url: str,  min_time: int = 65, max_time: int = 480, wait_time: int = 10):
+    chrome_driver_path = os.getenv("CHROME_DRIVER_PATH")
+    if chrome_driver_path is None:
+        chrome_driver_path = "/usr/bin/chromedriver"
+    scraper = SiteScraper(chrome_driver_path=chrome_driver_path, wait_time=wait_time)
+    return scrape_yt_playlist(playlist_url, scraper)
 
 def get_content_youtube(channel_id: str, min_time: int = 65, max_time: int = 480, wait_time: int = 5) -> tuple[list[str], list[tuple[str, str]]]:
     if not channel_id.startswith("UC") or not len(channel_id) == 24:
@@ -18,7 +38,7 @@ def get_content_youtube(channel_id: str, min_time: int = 65, max_time: int = 480
     chrome_driver_path = os.getenv("CHROME_DRIVER_PATH")
     if chrome_driver_path is None:
         chrome_driver_path = "/usr/bin/chromedriver"
-    scraper = SiteScraper(chrome_driver_path=chrome_driver_path)
+    scraper = SiteScraper(chrome_driver_path=chrome_driver_path, wait_time=wait_time)
     succeeded = []
     failed = []
     ytdl = yt_dlp.YoutubeDL()
