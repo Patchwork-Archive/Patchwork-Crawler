@@ -45,7 +45,6 @@ def get_content_youtube_channel(channel_id: str, min_time: int = 65, max_time: i
         music_flag = is_potentially_music_content(title)
         if music_flag[0]: # Check if the video is music content
             # Stage 2. Check length of video
-            ytdl.extract_info(video_id, download=False)
             try:
                 video_info = ytdl.extract_info(video_id, download=False)
             except Exception:
