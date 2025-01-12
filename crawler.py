@@ -119,6 +119,7 @@ def main(args):
                     f.write(f"{vid_id}\n")
             else:
                 enqueue_content_to_api(vid_id)
+        exit()
 
     if not args.youtube:
         # Default Holodex mode

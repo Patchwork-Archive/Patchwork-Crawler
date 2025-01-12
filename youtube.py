@@ -18,8 +18,6 @@ def scrape_yt_channel_videos(channel_url: str, scraper: SiteScraper) -> tuple[st
     """
     Scrapes a YouTube channel for all videos and their titles
     """
-    if not channel_url.startswith("https://youtube.com/watch?v=") or not channel_url.startswith("https://youtu.be/"):
-        channel_url = "https://youtube.com/watch?v=" + channel_url
     channel_video_raw_data = scraper.get_page_source(channel_url)
     video_tuples = find_all_yt_videos_yt(channel_video_raw_data)
     return video_tuples
