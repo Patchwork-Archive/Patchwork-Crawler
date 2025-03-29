@@ -5,7 +5,7 @@ import time
 
 
 class SiteScraper:
-    def __init__(self, chrome_driver_path: str, headless: bool = True, wait_time = 5):
+    def __init__(self, chrome_driver_path: str, headless: bool = False, wait_time = 5):
         """
         Initialize the SiteScraper with the path to ChromeDriver
         :param chrome_driver_path: Path to the ChromeDriver executable
@@ -19,6 +19,7 @@ class SiteScraper:
             if headless:
                 self.chrome_options.add_argument("--headless")
                 self.chrome_options.add_argument("--disable-gpu")
+                self.chrome_options.add_argument("--disable-dev-shm-usage")
                 self.chrome_options.add_argument("--window-size=1920,1080")
                 self.chrome_options.add_argument("--no-sandbox")
 
