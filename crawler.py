@@ -262,7 +262,7 @@ if __name__ == '__main__':
     parser.add_argument("--channel", type=str, help="Channel ID of YouTube Channel. Scrapes a singular channel for its contents")
     parser.add_argument("--db", action="store_true", help="Enqueue content to the DB instead of the API")
     parser.add_argument("--stub", action="store_true", help="Enqueue to a stub file instead of the API or DB")
-    parser.add_argument("--channel_id_source", type=str, default="channels.txt", help="The file containing the channel IDs. Specify DB to use MySQL DB via env variables")
+    parser.add_argument("--channel_id_source", type=str, default="channels.txt", help="The file containing the channel IDs. Specify DB to use PostgreSQL DB via env variables")
     parser.add_argument("--detailed", action="store_true", help="Visits each video and checks for validity with more detail")
     parser.add_argument("--direct-api", action="store_true", help="Use direct API calls instead of browser scraping for Holodex")
     if parser.parse_args().stub:
